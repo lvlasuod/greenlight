@@ -138,7 +138,7 @@ func (m MovieModel) Delete(id int64) error {
 		return ErrRecordNotFound
 	}
 
-	query := `
+	query := ` 
  		DELETE FROM movies
  		WHERE id = $1`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
