@@ -59,6 +59,38 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
+func (app *application) listMoviesHandler(w http.ResponseWriter, r *http.Request) {
+
+	var input struct {
+		Title  string
+		Genres []string
+		data.Filters
+	}
+
+	// Initialize a new Validator instance.
+	v := validator.New()
+
+	// Call r.URL.Query() to get the url.Values map containing the query  string data.
+	qs := r.URL.Query()
+
+	input.Title = app.readString(qs, "title", "")
+	input.Genres = app.readCSV(qs, "genres", []string{})
+
+	input.Filters.Page = app.readInt(qs, "page", 1, v)
+	input.Filters.PageSize = app.readInt(qs, "page_size", 20, v)
+
+	input.Filters.Sort = app.readString(qs, "sort", "id")
+
+	if !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	// Dump the contents of the input struct in a HTTP response.
+	fmt.Fprintf(w, "%+v\n", input)
+
+}
+
 // Add a showMovieHandler for the "GET /v1/movies/:id" endpoint. For now, we retrieve
 // the interpolated "id" parameter from the current URL and include it in a placeholder
 // response.
