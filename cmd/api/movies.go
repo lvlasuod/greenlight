@@ -81,11 +81,16 @@ func (app *application) listMoviesHandler(w http.ResponseWriter, r *http.Request
 
 	input.Filters.Sort = app.readString(qs, "sort", "id")
 
-	if !v.Valid() {
+	// Add the supported sort values for this endpoint to the sort safelist.
+	input.Filters.SortSafelist = []string{"id", "title", "year", "runtime", "-id", "-title", "-year", "-runtime"}
+
+	// Execute the validation checks on the Filters struct and send a response
+
+	// containing the errors if necessary.
+	if data.ValidateFilters(v, input.Filters); !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
-
 	// Dump the contents of the input struct in a HTTP response.
 	fmt.Fprintf(w, "%+v\n", input)
 
