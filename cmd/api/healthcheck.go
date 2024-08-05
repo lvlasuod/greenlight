@@ -18,10 +18,10 @@ func (app *application) healthcheckHandler(w http.ResponseWriter, r *http.Reques
 	// Pass the map to the json.Marshal() function. This returns a []byte slice
 	// containing the encoded JSON. If there was an error, we log it and send the client
 	// a generic error message.
-	err := app.writeJSON(w, http.StatusOK, data, nil)
+	err := app.writeJSON(w, http.StatusOK, data, nil, r)
 	if err != nil {
 		// Use the new serverErrorResponse() helper.
-        app.serverErrorResponse(w, r, err)
+		app.serverErrorResponse(w, r, err)
 	}
 
 }

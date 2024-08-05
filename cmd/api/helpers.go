@@ -85,7 +85,7 @@ func (app *application) readInt(qs url.Values, key string, defaultValue int,
 // Define an envelope type.
 type envelope map[string]any
 
-func (app *application) writeJSON(w http.ResponseWriter, status int, data envelope, headers http.Header) error {
+func (app *application) writeJSON(w http.ResponseWriter, status int, data envelope, headers http.Header, requestInfo *http.Request) error {
 	// Encode the data to JSON, returning the error if there was one.
 	// Use the json.MarshalIndent() function so that whitespace is added to the encoded
 	// JSON. Here we use no line prefix ("") and tab indents ("\t") for each element.
@@ -111,6 +111,20 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data envelo
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	w.Write(js)
+	
+	var Red = "\033[31m"
+	var Green = "\033[32m"
+	var Yellow = "\033[33m"
+	var Blue = "\033[34m"
+	var Gray = "\033[37m"
+	var Reset = "\033[0m"
+	var Color = Red
+	if status == 200 {
+		Color = Green
+	}
+
+	// log request info in to output
+	fmt.Printf(Yellow+"%s"+Reset+" "+Gray+"requested on"+Reset+" "+Blue+"%s"+Reset+""+Color+" %d"+Reset+"\n", requestInfo.Method, strings.Split(requestInfo.RequestURI, "?")[0], status)
 
 	return nil
 }

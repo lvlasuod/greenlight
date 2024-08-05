@@ -53,7 +53,7 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 	headers.Set("Location", fmt.Sprintf("/v1/movies/%d", movie.ID))
 
 	err = app.writeJSON(w, http.StatusCreated, envelope{"movie": movie},
-		headers)
+		headers, r)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
@@ -94,7 +94,7 @@ func (app *application) listMoviesHandler(w http.ResponseWriter, r *http.Request
 	// Dump the contents of the input struct in a HTTP response.
 	//fmt.Fprintf(w, "%+v\n", input)
 
-	movies, err := app.models.Movies.GetAll(input.Title, input.Genres,
+	movies, metadata, err := app.models.Movies.GetAll(input.Title, input.Genres,
 		input.Filters)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
@@ -102,7 +102,7 @@ func (app *application) listMoviesHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	// Send a JSON response containing the movie data.
-	err = app.writeJSON(w, http.StatusOK, envelope{"movies": movies}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"movies": movies, "metadata": metadata}, nil, r)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
@@ -130,7 +130,7 @@ func (app *application) showMovieHandler(w http.ResponseWriter, r *http.Request)
 		}
 		return
 	}
-	err = app.writeJSON(w, http.StatusOK, envelope{"movie": movie}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"movie": movie}, nil, r)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
@@ -202,7 +202,7 @@ func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	// Write the updated movie record in a JSON response.
-	err = app.writeJSON(w, http.StatusOK, envelope{"movie": movie}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"movie": movie}, nil, r)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
@@ -229,7 +229,7 @@ func (app *application) deleteMovieHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	// Return a 200 OK status code along with a success message.
-	err = app.writeJSON(w, http.StatusOK, envelope{"message": "The movie successfully deleted"}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"message": "The movie successfully deleted"}, nil, r)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
