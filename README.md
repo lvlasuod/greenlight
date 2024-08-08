@@ -1,18 +1,18 @@
 ### Let's GO Further book by Alex Edwars, Summer 2024
 ## Greenlight an Open Movie Database API
 
-- :white_check_mark: Skeleton Structure
-- :white_check_mark A Basic HTTP Server
-- :white_check_mark API Endpoints
-- :white_check_mark JSON Responses
-- :white_check_mark Parsing JSON Requests
-- :white_check_mark PostgreSQL and DB Setup
-- :white_check_mark SQL Migrations
-- :white_check_mark CRUD Operations 
-- :white_check_mark Advanced CRUD Operations
-- :white_check_mark Filtering, Sorting, Pagination
-- :white_check_mark Rate Limiting
-- :white_check_mark Graceful Shutdown
+- :white_check_mark:: Skeleton Structure
+- :white_check_mark: A Basic HTTP Server
+- :white_check_mark: API Endpoints
+- :white_check_mark: JSON Responses
+- :white_check_mark: Parsing JSON Requests
+- :white_check_mark: PostgreSQL and DB Setup
+- :white_check_mark: SQL Migrations
+- :white_check_mark: CRUD Operations 
+- :white_check_mark: Advanced CRUD Operations
+- :white_check_mark: Filtering, Sorting, Pagination
+- :white_check_mark: Rate Limiting
+- :white_check_mark: Graceful Shutdown
 - [ ] User Model Setup and Registration
 - [ ] Sending Emails
 - [ ] User Activation (Tokens)
