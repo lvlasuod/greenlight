@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"time"
 
@@ -115,21 +114,15 @@ func main() {
 	// Declare a HTTP server which listens on the port provided in the config struct,
 	// uses the servemux we created above as the handler, has some sensible timeout
 	// settings and writes any log messages to the structured logger at Error level.
-	srv := &http.Server{
-		Addr:         fmt.Sprintf(":%d", cfg.port),
-		Handler:      app.routes(),
-		IdleTimeout:  time.Minute,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-	}
 
 	logger.Printf("Starting server on localhost...")
 	// Start the HTTP server.
-	logger.Printf("Running %s server on %s", cfg.env, srv.Addr)
+	logger.Printf("Running %s server on %s", cfg.env, fmt.Sprintf(":%d", cfg.port))
 
-	err = srv.ListenAndServe()
-
-	logger.Fatal(err)
+	err = app.serve()
+	if err != nil {
+		logger.Fatal(err, nil)
+	}
 
 }
 func openDB(cfg config) (*pgxpool.Pool, error) {
