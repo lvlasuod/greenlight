@@ -111,7 +111,7 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data envelo
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	w.Write(js)
-	
+
 	var Red = "\033[31m"
 	var Green = "\033[32m"
 	var Yellow = "\033[33m"
@@ -119,7 +119,7 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data envelo
 	var Gray = "\033[37m"
 	var Reset = "\033[0m"
 	var Color = Red
-	if status == 200 {
+	if status == 200 || status == 201 {
 		Color = Green
 	}
 

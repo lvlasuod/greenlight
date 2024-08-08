@@ -13,7 +13,7 @@
 - :white_check_mark: Filtering, Sorting, Pagination
 - :white_check_mark: Rate Limiting
 - :white_check_mark: Graceful Shutdown
-- [ ] User Model Setup and Registration
+- :white_check_mark: User Model Setup and Registration
 - [ ] Sending Emails
 - [ ] User Activation (Tokens)
 - [ ] Authentication
