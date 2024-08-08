@@ -1,7 +1,7 @@
 ### Let's GO Further book by Alex Edwars, Summer 2024
 ## Greenlight an Open Movie Database API
 
-- :white_check_mark Skeleton Structure
+- :white_check_mark: Skeleton Structure
 - [x] A Basic HTTP Server
 - [x] API Endpoints
 - [x] JSON Responses
