@@ -1,10 +1,10 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 
+	"github.com/jackc/pgx"
 	"greenlight.mpdev.com/internal/data"
 	"greenlight.mpdev.com/internal/validator"
 )
@@ -123,7 +123,7 @@ func (app *application) showMovieHandler(w http.ResponseWriter, r *http.Request)
 	movie, err := app.models.Movies.Get(id)
 	if err != nil {
 		switch {
-		case errors.Is(err, data.ErrRecordNotFound):
+		case err.Error() == pgx.ErrNoRows.Error():
 			app.notFoundResponse(w, r)
 		default:
 			app.serverErrorResponse(w, r, err)
@@ -147,7 +147,7 @@ func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Reques
 	movie, err := app.models.Movies.Get(id)
 	if err != nil {
 		switch {
-		case errors.Is(err, data.ErrRecordNotFound):
+		case err.Error() == pgx.ErrNoRows.Error():
 			app.notFoundResponse(w, r)
 		default:
 			app.serverErrorResponse(w, r, err)
@@ -194,7 +194,7 @@ func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Reques
 	err = app.models.Movies.Update(movie)
 	if err != nil {
 		switch {
-		case errors.Is(err, data.ErrEditConflict):
+		case err.Error() == data.ErrEditConflict.Error():
 			app.editConflictResponse(w, r)
 		default:
 			app.serverErrorResponse(w, r, err)
@@ -220,7 +220,7 @@ func (app *application) deleteMovieHandler(w http.ResponseWriter, r *http.Reques
 
 	if err != nil {
 		switch {
-		case errors.Is(err, data.ErrRecordNotFound):
+		case err.Error() == pgx.ErrNoRows.Error():
 			app.notFoundResponse(w, r)
 		default:
 			app.serverErrorResponse(w, r, err)

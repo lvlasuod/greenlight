@@ -20,20 +20,24 @@ func (app *application) routes() http.Handler {
 	router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
 
 	// Serving routers
-	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler) //Show application information
 
 	// Movies
-	router.HandlerFunc(http.MethodPost, "/v1/movies", app.createMovieHandler)
+	router.HandlerFunc(http.MethodPost, "/v1/movies", app.createMovieHandler) // Create a new movie
 
-	router.HandlerFunc(http.MethodGet, "/v1/movies", app.listMoviesHandler)
-	router.HandlerFunc(http.MethodGet, "/v1/movies/:id", app.showMovieHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/movies", app.listMoviesHandler)    // Show the details of all Movies
+	router.HandlerFunc(http.MethodGet, "/v1/movies/:id", app.showMovieHandler) // Show the details of a specific movie
 
-	router.HandlerFunc(http.MethodPatch, "/v1/movies/:id", app.updateMovieHandler)
+	router.HandlerFunc(http.MethodPatch, "/v1/movies/:id", app.updateMovieHandler) // Update the details of a specific movie
 
-	router.HandlerFunc(http.MethodDelete, "/v1/movies/:id", app.deleteMovieHandler)
+	router.HandlerFunc(http.MethodDelete, "/v1/movies/:id", app.deleteMovieHandler) // Delete a specific movie
 
 	// Users
-	router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)
+	router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)          // Register a new user
+	router.HandlerFunc(http.MethodPut, "/v1/users/activated", app.activateUserHandler) //Activate a specific user
+
+	// POST /v1/tokens/activation endpoint.
+	router.HandlerFunc(http.MethodPost, "/v1/tokens/activation", app.createActivationTokenHandler) //Generate a new activation token
 
 	// Wrap the router with the panic recovery middleware.
 	return app.recoverPanic(app.rateLimit(router))

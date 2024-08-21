@@ -43,6 +43,11 @@ func (app *application) serve() error {
 
 		shutdownError <- srv.Shutdown(ctx)
 
+		// Log a message to say that the signal has been caught.
+		app.logger.Printf("Completing background tasks...")
+		app.wg.Wait()
+		shutdownError <- nil
+
 	}()
 
 	err := srv.ListenAndServe()

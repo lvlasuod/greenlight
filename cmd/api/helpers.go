@@ -119,7 +119,7 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data envelo
 	var Gray = "\033[37m"
 	var Reset = "\033[0m"
 	var Color = Red
-	if status == 200 || status == 201 {
+	if status == 200 || status == 201 || status == 202 {
 		Color = Green
 	}
 
@@ -221,4 +221,27 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst int
 		return errors.New("body must only contain a single JSON value")
 	}
 	return nil
+}
+
+// The background() helper accepts an arbitrary function as a parameter.
+func (app *application) background(fn func()) {
+
+	// Increment the WaitGroup counter.
+	app.wg.Add(1)
+
+	// Launch a background goroutine.
+	go func() {
+
+		// Use defer to decrement the WaitGroup counter before the goroutine returns.
+		defer app.wg.Done()
+
+		// Recover any panic.
+		defer func() {
+			if err := recover(); err != nil {
+				app.logger.Printf("%s", err)
+			}
+		}()
+		// Execute the arbitrary function that we passed as the parameter.
+		fn()
+	}()
 }
