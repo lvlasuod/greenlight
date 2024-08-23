@@ -16,7 +16,7 @@
 - :white_check_mark: User Model Setup and Registration
 - :white_check_mark: Sending Emails
 - :white_check_mark: User Activation (Tokens)
-- [ ] Authentication
+- :white_check_mark: Authentication
 - [ ] Permission-based Authorization
 - [ ] Cross Origin Request
 - [ ] Metrics
