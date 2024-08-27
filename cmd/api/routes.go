@@ -23,14 +23,14 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler) //Show application information
 
 	// Movies
-	router.HandlerFunc(http.MethodPost, "/v1/movies", app.createMovieHandler) // Create a new movie
+	router.HandlerFunc(http.MethodPost, "/v1/movies", app.requirePermission("movies:write", app.createMovieHandler)) // Create a new movie
 
-	router.HandlerFunc(http.MethodGet, "/v1/movies", app.listMoviesHandler)    // Show the details of all Movies
-	router.HandlerFunc(http.MethodGet, "/v1/movies/:id", app.showMovieHandler) // Show the details of a specific movie
+	router.HandlerFunc(http.MethodGet, "/v1/movies", app.requirePermission("movies:read", app.listMoviesHandler))    // Show the details of all Movies
+	router.HandlerFunc(http.MethodGet, "/v1/movies/:id", app.requirePermission("movies:read", app.showMovieHandler)) // Show the details of a specific movie
 
-	router.HandlerFunc(http.MethodPatch, "/v1/movies/:id", app.updateMovieHandler) // Update the details of a specific movie
+	router.HandlerFunc(http.MethodPatch, "/v1/movies/:id", app.requirePermission("movies:write", app.updateMovieHandler)) // Update the details of a specific movie
 
-	router.HandlerFunc(http.MethodDelete, "/v1/movies/:id", app.deleteMovieHandler) // Delete a specific movie
+	router.HandlerFunc(http.MethodDelete, "/v1/movies/:id", app.requirePermission("movies:write", app.deleteMovieHandler)) // Delete a specific movie
 
 	// Users
 	router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)          // Register a new user
@@ -44,3 +44,4 @@ func (app *application) routes() http.Handler {
 	// Wrap the router with the panic recovery middleware.
 	return app.recoverPanic(app.rateLimit(app.authenticate(router)))
 }
+

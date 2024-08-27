@@ -16,17 +16,19 @@ var (
 // Create a Models struct which wraps the MovieModel. We'll add other models to this,
 // like a UserModel and PermissionModel, as our build progresses.
 type Models struct {
-	Movies MovieModel
-	Users  UserModel
-	Tokens TokenModel
+	Movies      MovieModel
+	Permissions PermissionModel
+	Users       UserModel
+	Tokens      TokenModel
 }
 
 // For ease of use, we also add a New() method which returns a Models struct containing
 // the initialized MovieModel.
 func NewModels(db *pgxpool.Pool) Models {
 	return Models{
-		Movies: MovieModel{DB: db},
-		Users:  UserModel{DB: db},
-		Tokens: TokenModel{DB: db},
+		Movies:      MovieModel{DB: db},
+		Permissions: PermissionModel{DB: db},
+		Users:       UserModel{DB: db},
+		Tokens:      TokenModel{DB: db},
 	}
 }

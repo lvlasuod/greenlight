@@ -61,9 +61,12 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	//headers := make(http.Header)
-	//headers.Set("Location", fmt.Sprintf("/v1/users/%d", user.ID))
-
+	// Add the "movies:read" permission for the new user.
+	err = app.models.Permissions.AddForUser(user.ID, "movies:read")
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
 	token, err := app.models.Tokens.New(user.ID, 3*24*time.Hour, data.ScopeActivation)
 
 	if err != nil {
@@ -78,8 +81,8 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 			"activationToken": token.Plaintext,
 			"userID":          user.ID,
 		}
-		
-		// remove the below line in production 
+
+		// remove the below line in production
 		fmt.Printf("Token %s\n", token.Plaintext)
 
 		err = app.mailer.Send(user.Email, "user_welcome.tmpl", data)
