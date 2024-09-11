@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"expvar"
 	"flag"
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -34,8 +36,7 @@ type config struct {
 	db   struct {
 		dsn          string
 		maxOpenConns int
-
-		maxIdleTime string
+		maxIdleTime  string
 	}
 	limiter struct {
 		rps     float64
@@ -66,6 +67,20 @@ type application struct {
 }
 
 func main() {
+
+	// Publish a new "version" variable in the expvar handler containing our application version number
+	expvar.NewString("version").Set(version)
+
+	// Publish the number of active goroutines.
+	expvar.Publish("goroutines", expvar.Func(func() interface{} {
+		return runtime.NumGoroutine()
+	}))
+
+	// Publish the current Unix timestamp.
+	expvar.Publish("timestamp", expvar.Func(func() interface{} {
+		return time.Now().Unix()
+	}))
+
 	// Declare an instance of the config struct.
 	var cfg config
 
@@ -92,7 +107,7 @@ func main() {
 	flag.StringVar(&cfg.smtp.username, "smtp-username", "4e6eed36623980", "SMTP username")
 	flag.StringVar(&cfg.smtp.password, "smtp-password", "72f6b25705cfc3", "SMTP password")
 	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Greenlight <no-reply@greenlight.mpdev.com>", "SMTP sender")
-	
+
 	flag.Func("cors-trusted-origins", "Trusted CORS origins (space separated)", func(val string) error {
 		cfg.cors.trustedOrigins = strings.Fields(val)
 		return nil
@@ -128,6 +143,28 @@ func main() {
 	}
 
 	logger.Printf("Database migrations applied [up]")
+
+	// Publish the database connection pool statistics.
+	expvar.Publish("database", expvar.Func(func() interface{} {
+		type CustomStats struct {
+			TotalConns              int32
+			MaxConns                int32
+			IdleConns               int32
+			MaxIdleDestroyCount     int64
+			MaxLifetimeDestroyCount int64
+			AcquireCount            int64
+			AcquireDuration         time.Duration
+		}
+		return CustomStats{
+			TotalConns:              db.Stat().TotalConns(),
+			MaxConns:                db.Stat().MaxConns(),
+			IdleConns:               db.Stat().IdleConns(),
+			MaxIdleDestroyCount:     db.Stat().MaxIdleDestroyCount(),
+			MaxLifetimeDestroyCount: db.Stat().MaxLifetimeDestroyCount(),
+			AcquireCount:            db.Stat().AcquireCount(),
+			AcquireDuration:         db.Stat().AcquireDuration(),
+		}
+	}))
 
 	// Declare an instance of the application struct, containing the config struct and
 	// the logger.

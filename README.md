@@ -19,4 +19,6 @@
 - :white_check_mark: Authentication
 - :white_check_mark: Permission-based Authorization
 - :white_check_mark: Cross Origin Request
-- [ ] Metrics
+- :white_check_mark: Metrics
+- [ ] ...
+

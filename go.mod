@@ -5,6 +5,7 @@ go 1.22.3
 require github.com/julienschmidt/httprouter v1.3.0
 
 require (
+	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/go-mail/mail/v2 v2.3.0 // indirect
 	github.com/golang-migrate/migrate/v4 v4.17.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
