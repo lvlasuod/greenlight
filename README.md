@@ -18,5 +18,5 @@
 - :white_check_mark: User Activation (Tokens)
 - :white_check_mark: Authentication
 - :white_check_mark: Permission-based Authorization
-- [ ] Cross Origin Request
+- :white_check_mark: Cross Origin Request
 - [ ] Metrics
