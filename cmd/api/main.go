@@ -16,6 +16,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres" // New import
 	_ "github.com/golang-migrate/migrate/v4/source/file"       // New import
 	"github.com/jackc/pgx/v5/pgxpool"
+
 	"greenlight.mpdev.com/internal/data"
 	"greenlight.mpdev.com/internal/mailer"
 )
@@ -66,7 +67,40 @@ type application struct {
 	wg     sync.WaitGroup
 }
 
+/*
+func recordMetrics() {
+
+	defer opsRequested.Dec()
+	// loop
+	go func() {
+		for {
+			opsProcessed.Inc()
+			time.Sleep(2 * time.Second)
+		}
+	}()
+}
+
+var (
+	opsProcessed = promauto.NewCounter(prometheus.CounterOpts{
+		Namespace: "go_metrics",
+		Subsystem: "prometheus",
+		Name:      "processed_record_total",
+		Help:      "process metrics count",
+	})
+
+	opsRequested = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: "go_metrics",
+		Subsystem: "prometheus",
+		Name:      "processed_record_count",
+		Help:      "request record count",
+	})
+			recordMetrics()
+
+)*/
+
 func main() {
+
+	
 
 	// Publish a new "version" variable in the expvar handler containing our application version number
 	expvar.NewString("version").Set(version)
@@ -191,16 +225,7 @@ func main() {
 
 }
 func openDB(cfg config) (*pgxpool.Pool, error) {
-	/*
-		db, err := sql.Open("postgres", cfg.db.dsn)
-		if err != nil {
-			return nil, err
-		}
 
-		// Create a context with a 5-second timeout deadline.
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-	*/
 	// Create a context with a 5-second timeout deadline.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

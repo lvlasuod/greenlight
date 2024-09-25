@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/felixge/httpsnoop"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"golang.org/x/time/rate"
 	"greenlight.mpdev.com/internal/data"
 	"greenlight.mpdev.com/internal/validator"
@@ -218,6 +220,34 @@ func (app *application) metrics(next http.Handler) http.Handler {
 	totalResponsesSent := expvar.NewInt("total_responses_sent")
 	totalProcessingTimeMicroseconds := expvar.NewInt("total_processing_time_μs")
 	totalResponsesSentByStatus := expvar.NewMap("total_responses_sent_by_status")
+	var (
+		opsProcessed = promauto.NewCounter(prometheus.CounterOpts{
+			Namespace: "go_metrics",
+			Subsystem: "prometheus",
+			Name:      "processed_record_total",
+			Help:      "process metrics count",
+		})
+
+		opsRequested = promauto.NewGauge(prometheus.GaugeOpts{
+			Namespace: "go_metrics",
+			Subsystem: "prometheus",
+			Name:      "processed_record_count",
+			Help:      "request record count",
+		})
+		promTotalRequestsReceived = promauto.NewGauge(prometheus.GaugeOpts{
+			Namespace: "go_metrics",
+			Subsystem: "prometheus",
+			Name:      "total_requests_received",
+			Help:      "total requests received",
+		})
+
+		promTotalResponsesSentByStatus = promauto.NewCounterVec(prometheus.CounterOpts{
+			Namespace: "go_metrics",
+			Subsystem: "prometheus",
+			Name:      "http_requests_total",
+			Help:      "Total number of API requests by HTTP code.",
+		}, []string{"code", "method", "handler"})
+	)
 
 	// The following code will be run for every request...
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -233,6 +263,13 @@ func (app *application) metrics(next http.Handler) http.Handler {
 		totalResponsesSent.Add(1)
 
 		totalResponsesSentByStatus.Add(strconv.Itoa(metrics.Code), 1)
+
+		promTotalResponsesSentByStatus.WithLabelValues(strconv.Itoa(metrics.Code), r.Method, strings.Split(r.RequestURI, "?")[0]).Add(1)
+
+		// prometheus metrics
+		opsRequested.Add(1)
+		opsProcessed.Add(1)
+		promTotalRequestsReceived.Add(1)
 	})
 
 }
