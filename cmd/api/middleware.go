@@ -220,6 +220,7 @@ func (app *application) metrics(next http.Handler) http.Handler {
 	totalResponsesSent := expvar.NewInt("total_responses_sent")
 	totalProcessingTimeMicroseconds := expvar.NewInt("total_processing_time_μs")
 	totalResponsesSentByStatus := expvar.NewMap("total_responses_sent_by_status")
+
 	var (
 		opsProcessed = promauto.NewCounter(prometheus.CounterOpts{
 			Namespace: "go_metrics",
@@ -264,12 +265,44 @@ func (app *application) metrics(next http.Handler) http.Handler {
 
 		totalResponsesSentByStatus.Add(strconv.Itoa(metrics.Code), 1)
 
-		promTotalResponsesSentByStatus.WithLabelValues(strconv.Itoa(metrics.Code), r.Method, strings.Split(r.RequestURI, "?")[0]).Add(1)
-
 		// prometheus metrics
+		// Record the duration in microseconds
+		//duration := float64(time.Since(start).Microseconds())
+		//timer := prometheus.NewTimer(promHttpRequestDuration.WithLabelValues(strings.Split(r.RequestURI, "?")[0]))
+		//defer timer.ObserveDuration()
+		//fmt.Printf("hello from muiddleware on %s with %0.0f μs \n", strings.Split(r.RequestURI, "?")[0], float64(metrics.Duration.Microseconds()))
+		//promHttpRequestDuration.WithLabelValues(strings.Split(r.RequestURI, "?")[0]).Observe(float64(metrics.Duration.Microseconds()))
+
 		opsRequested.Add(1)
 		opsProcessed.Add(1)
+
 		promTotalRequestsReceived.Add(1)
+		promTotalResponsesSentByStatus.WithLabelValues(strconv.Itoa(metrics.Code), r.Method, strings.Split(r.RequestURI, "?")[0]).Add(1)
+
 	})
 
+}
+func (app *application) measureDuration(next http.Handler) http.Handler {
+	var (
+		requestDuration = prometheus.NewHistogramVec(
+			prometheus.HistogramOpts{
+				Namespace: "go_metrics",
+				Subsystem: "prometheus",
+				Name:      "http_request_duration_seconds",
+				Help:      "Histogram of request durations",
+				Buckets:   []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10},
+			},
+			[]string{"method", "handler"},
+		)
+	)
+	prometheus.MustRegister(requestDuration)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next.ServeHTTP(w, r)
+		duration := time.Since(start)
+
+		//fmt.Printf("hello from muiddleware on %s with %0.0f μs \n", r.URL.Path, float64(duration.Microseconds()))
+		// Observe the duration with method and endpoint labels
+		requestDuration.WithLabelValues(r.Method, r.URL.Path).Observe(float64(duration.Microseconds()))
+	})
 }
